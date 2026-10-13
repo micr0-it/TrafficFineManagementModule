@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.Workflow
 {
-    internal class ApprovalFWorkFlow
+    internal class ApprovalWorkFlow
     {
     }
 }
