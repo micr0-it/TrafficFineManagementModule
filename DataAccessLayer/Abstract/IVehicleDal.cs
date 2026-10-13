@@ -9,7 +9,7 @@ namespace DataAccessLayer.Abstract
 {
     public interface IVehicleDal : IGenericDal<Vehicle>
     {
-        Task<List<Vehicle>> GetListWithLicenseHolderAsync();
+        
         Task<Vehicle?> GetByPlateAsync(string plate);
     }
 }

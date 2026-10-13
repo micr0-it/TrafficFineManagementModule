@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace EntityLayer.Concrete
 {
+    /// <summary>
+    /// Şirkette araç kullanan çalışan. Ceza anında aracı kimin kullandığını belirtmek için kullanılır.
+    /// </summary>
     public class Driver
     {
         [Key]
@@ -19,8 +22,8 @@ namespace EntityLayer.Concrete
         /// </summary>
         public string? DriverLicenceNo{ get; set; }
         public string? DriverLicenceClass{ get; set; }
-        public int DriverFinePoint { get; set; }
-        public ICollection<Vehicle> DriverVehiclesOwned{ get; set; } = new List<Vehicle>();
+        
+        //Puan Hesabı attribute eklemiştim kaldırdım.
         public ICollection<TrafficFine> TrafficFines{ get; set; } = new List<TrafficFine>();
     }
 }

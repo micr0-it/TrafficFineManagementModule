@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EntityLayer.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -12,16 +13,15 @@ namespace EntityLayer.Concrete
         [Key]
         public int VehicleId { get; set; }
         public string VehiclePlate { get; set; } = null!;
+        public VehicleType VehicleType { get; set; }
         public string VehicleModel { get; set; } = null!;
         public string VehicleBrand { get; set; } = null!;
         public string? VehicleLicenceSerialNo { get; set; }
-        public DateTime? VehicleRegistrationDate { get; set; }
 
-        /// <summary>
-        /// Aracın ruhsat sahibi. Aracı kullanan sürücüyle aynı kişi olmak zorunda değildir.
-        /// </summary>
-        public int VehicleLicenseHolderId { get; set; }
-        public Driver VehicleLicenseHolder { get; set; } = null!;
+        //Ruhsat sahibi alanlarımızı eklemiştim fakat kaldırdım
+        //filodaki araçların ruhsat sahibi zaten şirket.
+        
+        public DateTime? VehicleRegistrationDate { get; set; }
         public ICollection<TrafficFine> VehicleFines { get; set; } = new List<TrafficFine>();
 
     }

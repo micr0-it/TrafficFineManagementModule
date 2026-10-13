@@ -17,7 +17,7 @@ namespace DataAccessLayer.Concrete.EntityFramework
 
         private IQueryable<TrafficFine> DetailedQuery()
         {
-            return _dbSet.Include(f => f.Vehicle).ThenInclude(v => v.VehicleLicenseHolder)
+            return _dbSet.Include(f => f.Vehicle)
                 .Include(f => f.Driver)
                 .Include(f => f.Driver)
                 .Include(f => f.TrafficFineType)

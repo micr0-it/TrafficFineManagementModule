@@ -28,10 +28,11 @@ namespace DataAccessLayer.Concrete
             {
                 e.HasIndex(v => v.VehiclePlate).IsUnique();
 
-                e.HasOne(v => v.VehicleLicenseHolder)
-                 .WithMany(d => d.DriverVehiclesOwned)
-                 .HasForeignKey(v => v.VehicleLicenseHolderId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                builder.Entity<Vehicle>(e =>
+                {
+                    e.HasIndex(v => v.VehiclePlate).IsUnique();
+                    e.Property(v => v.VehicleType).HasConversion<string>();
+                });
             });
 
             builder.Entity<TrafficFineType>()
