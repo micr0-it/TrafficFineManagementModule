@@ -1,4 +1,5 @@
 ﻿using EntityLayer.Concrete;
+using EntityLayer.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace DataAccessLayer.Abstract
     {
         Task<List<TrafficFine>> GetListWithDetailsAsync();
         Task<TrafficFine?> GetByIdWithDetailsAsync(int id);
-        Task<List<TrafficFine>> GetPendingApprovalAsync();
+        Task<List<TrafficFine>> GetByStatusAsync(ApprovalStatus status);
 
         Task<List<TrafficFine>> GetByPersonnelAsync(int personnelId);
 

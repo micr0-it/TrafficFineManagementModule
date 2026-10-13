@@ -21,7 +21,7 @@ namespace EntityLayer.Concrete
         public bool IsActive { get; set; } = true;
 
         public ICollection<TrafficFine> EnteredFines{ get; set; } = new List<TrafficFine>(); //NullReferenceException’dan korunmak için
-        public ICollection<TrafficFine> ApprovedFines{ get; set; } = new List<TrafficFine>(); //NullReferenceException’dan korunmak için
+        public ICollection<TrafficFineApprovalHistory> PerformedActions { get; set; } = new List<TrafficFineApprovalHistory>();
 
     }
 }

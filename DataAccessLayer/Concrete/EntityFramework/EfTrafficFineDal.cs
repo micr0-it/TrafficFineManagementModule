@@ -23,26 +23,52 @@ namespace DataAccessLayer.Concrete.EntityFramework
                 .Include(f => f.TrafficFineType)
                 .Include(f => f.RecordedByPersonnel);
         }
+
+        /// <summary>
+        /// Detay sayfası için: onay geçmişi ve işlemi yapan kullanıcılar da yüklenir.
+        /// </summary>
+
+        /// <summary>
+        /// Liste sayflarında geçmişi yüklemeyeceğim, sadece detay sayfasında yükleyeceğim
+        /// Her listede geçmişi yüklemem gereksiz yük bindirecek
+        /// Include İçinde OrderBy kullanarak geçmiş tarihleri sırayla çağırdım.
+        /// </summary>
         public async Task<TrafficFine?> GetByIdWithDetailsAsync(int id)
         {
-            return await DetailedQuery().FirstOrDefaultAsync(f => f.TrafficFineId == id);
+            return await DetailedQuery()
+                .Include(f => f.ApprovalHistories
+                .OrderBy(h => h.ActionDate))
+                .ThenInclude(h => h.PerformedByUser)
+                .FirstOrDefaultAsync(f => f.TrafficFineId == id);
         }
-
+                
         public async Task<List<TrafficFine>> GetByPersonnelAsync(int personnelId)
         {
-            return await DetailedQuery().Where(f => f.RecordedByPersonnelId == personnelId)
+            return await DetailedQuery()
+                .Where(f => f.RecordedByPersonnelId == personnelId)
                 .OrderBy(f => f.TrafficFineDate)
                 .ToListAsync();
         }
 
         public async Task<List<TrafficFine>> GetListWithDetailsAsync()
         {
-            return await DetailedQuery().OrderByDescending(f => f.TrafficFineDate).ToListAsync();
+            return await DetailedQuery()
+                .OrderByDescending(f => f.TrafficFineDate)
+                .ToListAsync();
         }
 
         public async Task<List<TrafficFine>> GetPendingApprovalAsync()
         {
-            return await DetailedQuery().Where(f => f.ApprovalStatus == ApprovalStatus.PendingManagerApproval)
+            return await DetailedQuery()
+                .Where(f => f.ApprovalStatus == ApprovalStatus.PendingManagerApproval)
+                .OrderBy(f => f.TrafficFineDate)
+                .ToListAsync();
+        }
+
+        public async Task<List<TrafficFine>> GetByStatusAsync(ApprovalStatus status)
+        {
+            return await DetailedQuery()
+                .Where(f => f.ApprovalStatus == status)
                 .OrderBy(f => f.TrafficFineDate)
                 .ToListAsync();
         }

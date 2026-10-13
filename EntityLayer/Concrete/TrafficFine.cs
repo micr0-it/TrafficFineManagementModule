@@ -15,12 +15,10 @@ namespace EntityLayer.Concrete
         public string TrafficFineRecordNo { get; set; } = null!;
         public DateTime TrafficFineDate { get; set; }
         public decimal TrafficFineAmount { get; set; }
-        
+
         /// <summary>
-        /// Cezanın sürücüye/ruhsat sahibine bildirildiği tarih.
-        /// İndirim, son ödeme ve itiraz süreleri bu tarihten itibaren hesaplanır.
+        /// Cezanın şirkete tebliğ edildiği tarih.
         /// </summary>
-        /// 
         public DateTime? DateOfNotification { get; set; }
 
         public int VehicleId { get; set; }
@@ -29,6 +27,10 @@ namespace EntityLayer.Concrete
         public int TrafficFineTypeId { get; set; }
         public TrafficFineType TrafficFineType { get; set; } = null!;
 
+        /// <summary>
+        /// Ceza anında aracı kullanan sürücü. Radar/EDS gibi sürücünün bilinmediği
+        /// cezalarda boş kalabilir.
+        /// </summary>
         public int? DriverId { get; set; }
         public Driver? Driver { get; set; }
 
@@ -36,10 +38,6 @@ namespace EntityLayer.Concrete
         public ApprovalStatus ApprovalStatus { get; set; } = ApprovalStatus.New;
         public int RecordedByPersonnelId { get; set; }
         public AppUser RecordedByPersonnel { get; set; } = null!;
-        //public int? ApprovedByAdminId { get; set; }
-        //public AppUser? ApprovedByAdmin { get; set; }
-        //public DateTime? ApprovalDate { get; set; }
-        //public string? RefusalReason { get; set; }
-        ICollection<TrafficFineApprovalHistory> ApprovalHistories { get; set; } = new List<TrafficFineApprovalHistory>();
+        public ICollection<TrafficFineApprovalHistory> ApprovalHistories { get; set; } = new List<TrafficFineApprovalHistory>();
     }
 }

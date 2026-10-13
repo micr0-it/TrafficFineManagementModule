@@ -16,6 +16,7 @@ namespace DataAccessLayer.Concrete
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<TrafficFineType> TrafficFineTypes { get; set; }
         public DbSet<TrafficFine> TrafficFines { get; set; }
+        public DbSet<TrafficFineApprovalHistory> TrafficFineApprovalHistories { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<AppUser>(e =>
@@ -24,16 +25,14 @@ namespace DataAccessLayer.Concrete
                 e.Property(u => u.Role).HasConversion<string>();
             });
 
+            builder.Entity<Driver>().HasIndex(d => d.NationIdentityNo).IsUnique();
+
             builder.Entity<Vehicle>(e =>
             {
                 e.HasIndex(v => v.VehiclePlate).IsUnique();
-
-                builder.Entity<Vehicle>(e =>
-                {
-                    e.HasIndex(v => v.VehiclePlate).IsUnique();
-                    e.Property(v => v.VehicleType).HasConversion<string>();
-                });
+                e.Property(v => v.VehicleType).HasConversion<string>();
             });
+
 
             builder.Entity<TrafficFineType>()
                 .Property(t => t.Amount).HasPrecision(18, 2);
@@ -63,6 +62,32 @@ namespace DataAccessLayer.Concrete
                  .WithMany(u => u.EnteredFines)
                  .HasForeignKey(f => f.RecordedByPersonnelId)
                  .OnDelete(DeleteBehavior.Restrict);
+            });
+            builder.Entity<TrafficFineApprovalHistory>(e => {
+                e.Property(h => h.ActionType).HasConversion<string>();
+                e.Property(h => h.PreviousStatus).HasConversion<string>();
+                e.Property(h => h.NewStatus).HasConversion<string>();
+                e.Property(h => h.Description).HasMaxLength(500);
+
+
+                ///<summary>
+                ///Geçmiş -> ceza ilişkisinde bilinçli olarak Cascade kullandım
+                ///sadece “Yeni” durumdaki (henüz onaya gönderilmemiş) cezalar silinebilecek, 
+                ///onların geçmişinde de yalnızca “Oluşturuldu” kaydı olur
+                ///ceza silinince bu kaydın kalmasının anlamı yok.
+                ///Onaya girmiş cezaların silinmesini Business katmanında engelleyeceğim.
+                /// </summary>
+                e.HasOne(h => h.TrafficFine)
+                 .WithMany(f => f.ApprovalHistories)
+                 .HasForeignKey(h => h.TrafficFineId)
+                 .OnDelete(DeleteBehavior.Cascade);
+                
+                e.HasOne(h => h.PerformedByUser)
+                 .WithMany(f => f.PerformedActions)
+                 .HasForeignKey(h => h.PerformedByUserId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                
             });
         }
     }
