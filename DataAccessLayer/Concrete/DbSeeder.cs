@@ -15,7 +15,7 @@ namespace DataAccessLayer.Concrete
     {
         public static async Task SeedAsync(AppDbContext db)
         {
-            if (await db.AppUsers.AnyAsync(k => k.Role == UserRole.Admin))
+            if (await db.AppUsers.AnyAsync())
                 return;
 
             //var admin = new AppUser

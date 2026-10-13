@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261012190542_initialCreate")]
-    partial class initialCreate
+    [Migration("20261013093210_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,11 +35,14 @@ namespace DataAccessLayer.Migrations
 
                     b.Property<string>("AppUserName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("NameSurname")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PwdHash")
                         .IsRequired()
@@ -53,12 +56,9 @@ namespace DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("isActive")
-                        .HasColumnType("bit");
-
                     b.HasKey("AppUserId");
 
-                    b.HasIndex("NameSurname")
+                    b.HasIndex("AppUserName")
                         .IsUnique();
 
                     b.ToTable("AppUsers");
@@ -72,9 +72,6 @@ namespace DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DriverId"));
 
-                    b.Property<int>("DriverFinePoint")
-                        .HasColumnType("int");
-
                     b.Property<string>("DriverLicenceClass")
                         .HasColumnType("nvarchar(max)");
 
@@ -87,9 +84,12 @@ namespace DataAccessLayer.Migrations
 
                     b.Property<string>("NationIdentityNo")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("DriverId");
+
+                    b.HasIndex("NationIdentityNo")
+                        .IsUnique();
 
                     b.ToTable("Drivers");
                 });
@@ -102,23 +102,18 @@ namespace DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TrafficFineId"));
 
-                    b.Property<int>("ApprovalStatus")
-                        .HasColumnType("int");
+                    b.Property<string>("ApprovalStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DateOfNotification")
+                        .HasColumnType("datetime2");
 
                     b.Property<int?>("DriverId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("FluentAdminId")
+                    b.Property<int>("RecordedByPersonnelId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("FluentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("FluentStaffId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RefusalReason")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TrafficFineAmount")
                         .HasPrecision(18, 2)
@@ -129,9 +124,9 @@ namespace DataAccessLayer.Migrations
 
                     b.Property<string>("TrafficFineRecordNo")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("TrafficFineTypeId")
+                    b.Property<int>("TrafficFineTypeId")
                         .HasColumnType("int");
 
                     b.Property<int>("VehicleId")
@@ -141,15 +136,57 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("DriverId");
 
-                    b.HasIndex("FluentAdminId");
+                    b.HasIndex("RecordedByPersonnelId");
 
-                    b.HasIndex("FluentStaffId");
+                    b.HasIndex("TrafficFineRecordNo")
+                        .IsUnique();
 
                     b.HasIndex("TrafficFineTypeId");
 
                     b.HasIndex("VehicleId");
 
-                    b.ToTable("TrafikFines");
+                    b.ToTable("TrafficFines");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.TrafficFineApprovalHistory", b =>
+                {
+                    b.Property<int>("TrafficFineApprovalHistoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TrafficFineApprovalHistoryId"));
+
+                    b.Property<DateTime>("ActionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("NewStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PerformedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PreviousStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TrafficFineId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TrafficFineApprovalHistoryId");
+
+                    b.HasIndex("PerformedByUserId");
+
+                    b.HasIndex("TrafficFineId");
+
+                    b.ToTable("TrafficFineApprovalHistories");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.TrafficFineType", b =>
@@ -172,11 +209,11 @@ namespace DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<int>("TrafficFinePoint")
                         .HasColumnType("int");
-
-                    b.Property<bool>("isActive")
-                        .HasColumnType("bit");
 
                     b.HasKey("TrafficFineTypeId");
 
@@ -198,23 +235,25 @@ namespace DataAccessLayer.Migrations
                     b.Property<string>("VehicleLicenceSerialNo")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("VehicleLicenseHolderId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("VehicleLicenseValidationDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("VehicleModel")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VehiclePlate")
                         .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("VehicleRegistrationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("VehicleType")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("VehicleId");
 
-                    b.HasIndex("VehicleLicenseHolderId");
+                    b.HasIndex("VehiclePlate")
+                        .IsUnique();
 
                     b.ToTable("Vehicles");
                 });
@@ -223,59 +262,70 @@ namespace DataAccessLayer.Migrations
                 {
                     b.HasOne("EntityLayer.Concrete.Driver", "Driver")
                         .WithMany("TrafficFines")
-                        .HasForeignKey("DriverId");
-
-                    b.HasOne("EntityLayer.Concrete.AppUser", "FluentAdmin")
-                        .WithMany("ApprovedFines")
-                        .HasForeignKey("FluentAdminId")
+                        .HasForeignKey("DriverId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("EntityLayer.Concrete.AppUser", "FluentStaff")
+                    b.HasOne("EntityLayer.Concrete.AppUser", "RecordedByPersonnel")
                         .WithMany("EnteredFines")
-                        .HasForeignKey("FluentStaffId")
+                        .HasForeignKey("RecordedByPersonnelId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("EntityLayer.Concrete.TrafficFineType", null)
+                    b.HasOne("EntityLayer.Concrete.TrafficFineType", "TrafficFineType")
                         .WithMany("Fines")
-                        .HasForeignKey("TrafficFineTypeId");
+                        .HasForeignKey("TrafficFineTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("EntityLayer.Concrete.Vehicle", "Vehicle")
                         .WithMany("VehicleFines")
                         .HasForeignKey("VehicleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Driver");
 
-                    b.Navigation("FluentAdmin");
+                    b.Navigation("RecordedByPersonnel");
 
-                    b.Navigation("FluentStaff");
+                    b.Navigation("TrafficFineType");
 
                     b.Navigation("Vehicle");
                 });
 
-            modelBuilder.Entity("EntityLayer.Concrete.Vehicle", b =>
+            modelBuilder.Entity("EntityLayer.Concrete.TrafficFineApprovalHistory", b =>
                 {
-                    b.HasOne("EntityLayer.Concrete.Driver", "VehicleLicenseHolder")
-                        .WithMany("DriverVehiclesOwned")
-                        .HasForeignKey("VehicleLicenseHolderId");
+                    b.HasOne("EntityLayer.Concrete.AppUser", "PerformedByUser")
+                        .WithMany("PerformedActions")
+                        .HasForeignKey("PerformedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("VehicleLicenseHolder");
+                    b.HasOne("EntityLayer.Concrete.TrafficFine", "TrafficFine")
+                        .WithMany("ApprovalHistories")
+                        .HasForeignKey("TrafficFineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PerformedByUser");
+
+                    b.Navigation("TrafficFine");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.AppUser", b =>
                 {
-                    b.Navigation("ApprovedFines");
-
                     b.Navigation("EnteredFines");
+
+                    b.Navigation("PerformedActions");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.Driver", b =>
                 {
-                    b.Navigation("DriverVehiclesOwned");
-
                     b.Navigation("TrafficFines");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.TrafficFine", b =>
+                {
+                    b.Navigation("ApprovalHistories");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.TrafficFineType", b =>
