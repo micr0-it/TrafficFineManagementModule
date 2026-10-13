@@ -1,3 +1,5 @@
+using BusinessLayer.Abstract;
+using BusinessLayer.Concrete;
 using DataAccessLayer.Abstract;
 using DataAccessLayer.Concrete;
 using DataAccessLayer.Concrete.EntityFramework;
@@ -23,6 +25,11 @@ builder.Services.AddScoped<IAppUserDal, EfAppUserDal>();
 builder.Services.AddScoped<IVehicleDal, EfVehicleDal>();
 builder.Services.AddScoped<IDriverDal, EfDriverDal>();
 builder.Services.AddScoped<ITrafficFineTypeDal, EfTrafficFineTypeDal>();
+builder.Services.AddScoped<ITrafficFineService, TrafficFineManager>();
+builder.Services.AddScoped<IAppUserService, AppUserManager>();
+builder.Services.AddScoped<IVehicleService, VehicleManager>();
+builder.Services.AddScoped<IDriverService, DriverManager>();
+builder.Services.AddScoped<ITrafficFineTypeService, TrafficFineTypeManager>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
