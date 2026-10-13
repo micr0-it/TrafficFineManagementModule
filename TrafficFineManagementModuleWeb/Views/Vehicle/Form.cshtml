@@ -1,0 +1,64 @@
+﻿@model VehicleFormViewModel
+@{
+    ViewData["Title"] = Model.IsEdit ? "Araç Düzenle" : "Yeni Araç";
+}
+
+<h3 class="mb-3">@ViewData["Title"]</h3>
+
+<div class="row">
+    <div class="col-lg-6">
+        <form asp-action="@(Model.IsEdit ? "Edit" : "Create")" method="post">
+            <input type="hidden" asp-for="VehicleId" />
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="mb-3">
+                <label asp-for="VehiclePlate" class="form-label"></label>
+                <input asp-for="VehiclePlate" class="form-control" placeholder="34 ABC 123" />
+                <span asp-validation-for="VehiclePlate" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="VehicleType" class="form-label"></label>
+                <select asp-for="VehicleType" class="form-select"
+                        asp-items="Html.GetEnumSelectList<VehicleType>()">
+                    <option value="">Seçiniz</option>
+                </select>
+                <span asp-validation-for="VehicleType" class="text-danger small"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="VehicleBrand" class="form-label"></label>
+                    <input asp-for="VehicleBrand" class="form-control" />
+                    <span asp-validation-for="VehicleBrand" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="VehicleModel" class="form-label"></label>
+                    <input asp-for="VehicleModel" class="form-control" />
+                    <span asp-validation-for="VehicleModel" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="VehicleLicenceSerialNo" class="form-label"></label>
+                    <input asp-for="VehicleLicenceSerialNo" class="form-control" />
+                    <span asp-validation-for="VehicleLicenceSerialNo" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="VehicleRegistrationDate" class="form-label"></label>
+                    <input asp-for="VehicleRegistrationDate" class="form-control" />
+                    <span asp-validation-for="VehicleRegistrationDate" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+            <a asp-action="Index" class="btn btn-link">Vazgeç</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

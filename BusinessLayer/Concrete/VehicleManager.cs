@@ -45,16 +45,18 @@ namespace BusinessLayer.Concrete
         /// "34 abc 123" ve "34ABC123" aynı plaka sayılsın diye boşluklar silinir, büyük harfe çevrilir.
         /// Plakalarda Türkçe karakter olmadığı için invariant kültür kullanılır.
         /// </summary>
-        private static string NormalizePlate(string plate)
+        public static string NormalizePlate(string plate)
         {
            return plate.Replace(" ", "").ToUpperInvariant(); 
         }
         private async Task PrepareAndValidateAsync(Vehicle vehicle)
         {
+
             vehicle.VehiclePlate = NormalizePlate(vehicle.VehiclePlate);
             vehicle.VehicleBrand = vehicle.VehicleBrand.Trim();
             vehicle.VehicleModel = vehicle.VehicleModel.Trim();
-
+            if (!PlatePattern.IsMatch(vehicle.VehiclePlate))
+                throw new BusinessException("Geçersiz plaka formatı. Örnek: 34 ABC 123");
             //v.VehicleId != vehicle.VehicleId koşulu güncelleme için: araç düzenlenirken kendi plakasıyla çakışmasın.
             var existing = await _vehicleDal.GetListAsync(v =>
                 v.VehiclePlate == vehicle.VehiclePlate && v.VehicleId != vehicle.VehicleId);

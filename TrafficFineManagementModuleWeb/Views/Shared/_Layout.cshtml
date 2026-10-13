@@ -26,7 +26,13 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
-                    </ul
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Vehicle" asp-action="Index">Araçlar</a>
+                            </li>
+                        }
+                    
                     @if (User.Identity?.IsAuthenticated == true)
                       {
                         <div class="d-flex align-items-center gap-3">
@@ -39,12 +45,14 @@
                             </form>
                         </div>
                     }
+                    </ul
                 </div>
             </div>
         </nav>
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            <partial name="_Alerts" />
             @RenderBody()
         </main>
     </div>
