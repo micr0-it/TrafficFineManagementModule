@@ -1,0 +1,48 @@
+﻿@model LoginViewModel
+@{
+    ViewData["Title"] = "Giriş";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5 col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h4 class="card-title text-center mb-4">Trafik Cezası Yönetimi</h4>
+
+                <form asp-action="Login" method="post">
+                    <input type="hidden" asp-for="ReturnUrl" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="UserName" class="form-label"></label>
+                        <input asp-for="UserName" class="form-control" autofocus />
+                        <span asp-validation-for="UserName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Pwd" class="form-label"></label>
+                        <input asp-for="Pwd" class="form-control" />
+                        <span asp-validation-for="Pwd" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input asp-for="RememberMe" class="form-check-input" />
+                        <label asp-for="RememberMe" class="form-check-label"></label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Giriş Yap</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--
+    _ValidationScriptsPartial, [Required] kurallarını sunucuya gitmeden tarayıcıda da kontrol eder. Sunucu tarafındaki ModelState.IsValid kontrolü yine de kalmalı; 
+    tarayıcı tarafı kolayca atlatılabilir, asıl güvence sunucudadır.
+-->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

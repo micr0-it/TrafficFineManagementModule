@@ -4,6 +4,7 @@ using DataAccessLayer.Abstract;
 using DataAccessLayer.Concrete;
 using DataAccessLayer.Concrete.EntityFramework;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,9 +15,23 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(o =>
     {
         o.LoginPath = "/Account/Login";
+        o.LogoutPath = "/Account/Logout";
         o.AccessDeniedPath = "/Account/AccessDenied";
         o.ExpireTimeSpan = TimeSpan.FromHours(8);
+        //SlidingExpiration, kullanıcı aktif olduğu sürece oturum süresini yeniler; 8 saat boyunca hiç işlem yapmazsa oturum düşer.
+        o.SlidingExpiration = true;
     });
+
+// Aksi belirtilmedikçe tüm sayfalar giriş gerektirir
+///<summary>
+///FallbackPolicy, her controller’a tek tek [Authorize] yazmak yerine “varsayılan olarak her şey giriş gerektirsin” demek. 
+///Sadece login sayfası gibi açık olması gereken yerlere [AllowAnonymous] koyacağız. 
+///Böylece yeni bir controller eklerken [Authorize] yazmayı unutup sayfayı herkese açık bırakma riski ortadan kalkar.
+///</summary>
+builder.Services.AddAuthorization(o =>
+{
+    o.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -46,10 +61,12 @@ using (var scope = app.Services.CreateScope())
 }
 app.UseHttpsRedirection();
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
+//Fallback policy, CSS ve JS dosyalarına da giriş zorunluluğu getirebilir ve login sayfası tasarımsız görünür.
+//Düzeltelim app.MapStaticAssets().AllowAnonymous();
+app.MapStaticAssets().AllowAnonymous();
 
 app.MapControllerRoute(
     name: "default",

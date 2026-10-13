@@ -11,6 +11,6 @@ namespace BusinessLayer.Abstract
     {
         Task CreateUserAsync(AppUser user, string pwd);
         Task<AppUser?> ValidateLoginAsync(string userName, string pwd);
-        Task SetActiveStatusAsync(int userId, bool isActive)
+        Task SetActiveStatusAsync(int userId, bool isActive);
     }
 }
