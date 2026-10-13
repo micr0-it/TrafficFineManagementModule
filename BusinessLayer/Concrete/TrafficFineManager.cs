@@ -19,7 +19,7 @@ namespace BusinessLayer.Concrete
         private readonly ITrafficFineDal _trafficFineDal;
         private readonly ITrafficFineTypeDal _trafficFineTypeDal;
         private readonly IVehicleDal _vehicleDal;
-        public TrafficFineManager(ITrafficFineDal trafficFineDal,ITrafficFineTypeDal trafficFineTypeDal,IVehicleDal vehicleDal) : base(fineDal)
+        public TrafficFineManager(ITrafficFineDal trafficFineDal,ITrafficFineTypeDal trafficFineTypeDal,IVehicleDal vehicleDal) : base(trafficFineDal)
         {
             _trafficFineDal = trafficFineDal;
             _trafficFineTypeDal = trafficFineTypeDal;
