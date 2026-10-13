@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLayer.Abstract
+namespace BusinessLayer.Workflow
 {
-    public interface IAppealService
+    internal class ApprovalStep
     {
     }
 }
