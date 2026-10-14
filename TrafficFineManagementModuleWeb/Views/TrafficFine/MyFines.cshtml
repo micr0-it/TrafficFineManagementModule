@@ -1,0 +1,64 @@
+﻿@model List<TrafficFine>
+@{
+    ViewData["Title"] = "Cezalarım";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">Cezalarım</h3>
+    <a asp-action="Create" class="btn btn-primary">Yeni Ceza</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Henüz ceza girmediniz.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Tutanak No</th>
+                    <th>Ceza Tarihi</th>
+                    <th>Araç</th>
+                    <th>Ceza Türü</th>
+                    <th class="text-end">Tutar</th>
+                    <th>Durum</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var fine in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@fine.TrafficFineRecordNo</td>
+                        <td>@fine.TrafficFineDate.ToDateTime()</td>
+                        <td>@fine.Vehicle.VehiclePlate</td>
+                        <td>@fine.TrafficFineType.Article</td>
+                        <td class="text-end">@fine.TrafficFineAmount.ToMoney()</td>
+                        <td><partial name="_ApprovalStatusBadge" model="fine.ApprovalStatus" /></td>
+                        <td class="text-end text-nowrap">
+                            @if (fine.ApprovalStatus == ApprovalStatus.New)
+                            {
+                                <a asp-action="Edit" asp-route-id="@fine.TrafficFineId"
+                                   class="btn btn-sm btn-outline-primary">Düzenle</a>
+
+                                <form asp-action="Submit" asp-route-id="@fine.TrafficFineId"
+                                      method="post" class="d-inline"
+                                      onsubmit="return confirm('Ceza yönetici onayına gönderilsin mi? Gönderdikten sonra düzenleyemezsiniz.');">
+                                    <button type="submit" class="btn btn-sm btn-success">Onaya Gönder</button>
+                                </form>
+
+                                <form asp-action="Delete" asp-route-id="@fine.TrafficFineId"
+                                      method="post" class="d-inline"
+                                      onsubmit="return confirm('Ceza silinsin mi?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Sil</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,0 +1,68 @@
+﻿@model TrafficFineFormViewModel
+@{
+    ViewData["Title"] = Model.IsEdit ? "Ceza Düzenle" : "Yeni Ceza";
+}
+
+<h3 class="mb-3">@ViewData["Title"]</h3>
+
+<div class="row">
+    <div class="col-lg-8">
+        <form asp-action="@(Model.IsEdit ? "Edit" : "Create")" method="post">
+            <input type="hidden" asp-for="TrafficFineId" />
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="TrafficFineRecordNo" class="form-label"></label>
+                    <input asp-for="TrafficFineRecordNo" class="form-control" />
+                    <span asp-validation-for="TrafficFineRecordNo" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="TrafficFineDate" class="form-label"></label>
+                    <input asp-for="TrafficFineDate" class="form-control" />
+                    <span asp-validation-for="TrafficFineDate" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="VehicleId" class="form-label"></label>
+                <select asp-for="VehicleId" asp-items="Model.VehicleOptions" class="form-select">
+                    <option value="">Seçiniz</option>
+                </select>
+                <span asp-validation-for="VehicleId" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="TrafficFineTypeId" class="form-label"></label>
+                <select asp-for="TrafficFineTypeId" asp-items="Model.FineTypeOptions" class="form-select">
+                    <option value="">Seçiniz</option>
+                </select>
+                <span asp-validation-for="TrafficFineTypeId" class="text-danger small"></span>
+                <div class="form-text">Ceza tutarı seçilen türden otomatik alınır.</div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="DriverId" class="form-label"></label>
+                    <select asp-for="DriverId" asp-items="Model.DriverOptions" class="form-select">
+                        <option value="">Bilinmiyor (radar / EDS)</option>
+                    </select>
+                    <span asp-validation-for="DriverId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="DateOfNotification" class="form-label"></label>
+                    <input asp-for="DateOfNotification" class="form-control" />
+                    <span asp-validation-for="DateOfNotification" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+            <a asp-action="MyFines" class="btn btn-link">Vazgeç</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

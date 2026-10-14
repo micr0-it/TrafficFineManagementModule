@@ -1,0 +1,18 @@
+﻿
+@*
+    Cezanın durumu birçok ekranda renkli bir rozetle gösterilecek
+    Renk eşleşmesini burada tutacağım
+*@
+@model ApprovalStatus
+@{
+    var cssClass = Model switch
+    {
+        ApprovalStatus.New => "bg-secondary",
+        ApprovalStatus.PendingManagerApproval => "bg-warning text-dark",
+        ApprovalStatus.PendingFinanceApproval => "bg-info text-dark",
+        ApprovalStatus.Completed => "bg-success",
+        ApprovalStatus.Rejected => "bg-danger",
+        _ => "bg-light text-dark"
+    };
+}
+<span class="badge @cssClass">@Model.GetDisplayName()</span>
