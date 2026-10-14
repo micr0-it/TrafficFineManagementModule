@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -50,9 +51,15 @@ namespace DataAccessLayer.Concrete.EntityFramework
                 .ToListAsync();
         }
 
-        public async Task<List<TrafficFine>> GetListWithDetailsAsync()
+        public async Task<List<TrafficFine>> GetListWithDetailsAsync(Expression<Func<TrafficFine, bool>>? filter = null)
         {
-            return await DetailedQuery()
+            //Interface de belirttiğim gibi buraya ekledik where sorgusunu
+            var query = DetailedQuery();
+
+            if (filter is not null)
+                query = query.Where(filter);
+
+            return await query
                 .OrderByDescending(f => f.TrafficFineDate)
                 .ToListAsync();
         }

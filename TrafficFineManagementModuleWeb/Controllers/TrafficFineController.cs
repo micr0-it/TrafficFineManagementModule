@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Abstract;
 using BusinessLayer.Exceptions;
+using BusinessLayer.Models;
 using EntityLayer.Concrete;
 using EntityLayer.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -27,6 +28,33 @@ namespace TrafficFineManagementModuleWeb.Controllers
             _trafficFineTypeService = trafficFineTypeService;
         }
 
+
+        // ---------- Tüm roller: genel liste ----------
+
+        [HttpGet]
+        public async Task<IActionResult> Index(TrafficFineListViewModel model)
+        {
+            var criteria = new TrafficFineSearchCriteria
+            {
+                Status = model.Status,
+                VehicleType = model.VehicleType,
+                SearchText = model.SearchText,
+                DateFrom = model.DateFrom,
+                DateTo = model.DateTo
+            };
+
+            try
+            {
+                model.Fines = await _trafficFineService.SearchAsync(criteria);
+            }
+            catch (BusinessException ex)
+            {
+                // Filtre hatası sayfayı bozmasın; mesaj gösterilir, liste boş kalır
+                ModelState.AddModelError(string.Empty, ex.Message);
+            }
+
+            return View(model);
+        }
 
         // ---------- Personel: kendi cezaları ----------
 

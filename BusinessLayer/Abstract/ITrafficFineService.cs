@@ -1,4 +1,5 @@
-﻿using EntityLayer.Concrete;
+﻿using BusinessLayer.Models;
+using EntityLayer.Concrete;
 using EntityLayer.Enums;
 using System;
 using System.Collections.Generic;
@@ -22,5 +23,7 @@ namespace BusinessLayer.Abstract
         Task ApproveAsync(int fineId, int UserId, UserRole role, string? description);
         Task RejectAsync(int fineId, int UserId, UserRole role, string reason);
 
+        //Veri taşıayn nesnemi sorgulamak için ekledim.
+        Task<List<TrafficFine>> SearchAsync(TrafficFineSearchCriteria criteria);
     }
 }

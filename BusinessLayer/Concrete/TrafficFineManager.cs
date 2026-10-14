@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Abstract;
 using BusinessLayer.Exceptions;
+using BusinessLayer.Models;
 using BusinessLayer.Workflow;
 using DataAccessLayer.Abstract;
 using EntityLayer.Concrete;
@@ -53,6 +54,49 @@ namespace BusinessLayer.Concrete
         public Task<List<TrafficFine>> GetListWithDetailsAsync()
         {
             return _trafficFineDal.GetListWithDetailsAsync();
+        }
+
+
+        public async Task<List<TrafficFine>> SearchAsync(TrafficFineSearchCriteria criteria)
+        {
+
+            /*
+             
+            Buradaki algoritmada yaptıklarım
+            status == null || Kullanıcı bir filtreyi boş bıraktıysa koşulun ilk kısmı true olacak
+            ve o filtre devre dışı olacak bu saydede birden fazla if kullanmamış olacağız
+            Ef Core bşze bu yapıyla SQL çevrilirken boş olan filtreleri sorgudan cıkarma ayrıcalıgı tanıyor.
+
+            Arama hem tutanak numarası hem de plaka ile yapılır
+            Burada Normalize.Plate ile aramada 48 mug 48 yazsa bile 48MUG48 olacak
+
+            Bitiş tarihi: Ceza tarihleri saat de içeriyor. Bitiş tarihi olarak 14.10.2026 seçilirse <= 14.10.2026 00:00 koşulu, 
+            o gün saat 10:30'da kesilen cezayı dışarıda bırakırdı. “Bir sonraki günün başlangıcından küçük” demek tüm günü kapsıyor.
+             
+             
+             */
+            if (criteria.DateFrom is not null && criteria.DateTo is not null &&
+                criteria.DateFrom.Value.Date > criteria.DateTo.Value.Date)
+                throw new BusinessException("Başlangıç tarihi bitiş tarihinden sonra olamaz.");
+
+            var status = criteria.Status;
+            var vehicleType = criteria.VehicleType;
+
+            var recordNoSearch = string.IsNullOrWhiteSpace(criteria.SearchText) ? null : criteria.SearchText.Trim();
+            var plateSearch = recordNoSearch is null ? null : VehicleManager.NormalizePlate(recordNoSearch);
+
+            var dateFrom = criteria.DateFrom?.Date;
+            // Bitiş tarihi gün sonuna kadar dahil olsun diye bir sonraki günün başlangıcı kullanılır
+            var dateToExclusive = criteria.DateTo?.Date.AddDays(1);
+
+            return await _trafficFineDal.GetListWithDetailsAsync(f =>
+                (status == null || f.ApprovalStatus == status) &&
+                (vehicleType == null || f.Vehicle.VehicleType == vehicleType) &&
+                (recordNoSearch == null ||
+                    f.TrafficFineRecordNo.Contains(recordNoSearch) ||
+                    f.Vehicle.VehiclePlate.Contains(plateSearch!)) &&
+                (dateFrom == null || f.TrafficFineDate >= dateFrom) &&
+                (dateToExclusive == null || f.TrafficFineDate < dateToExclusive));
         }
 
         //Crud İşlemleri

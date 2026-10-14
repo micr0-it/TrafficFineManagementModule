@@ -50,6 +50,9 @@
                     }
                     @if (User.Identity?.IsAuthenticated == true)
                       {
+                          <li class="nav-item">
+    <a class="nav-link text-dark" asp-controller="TrafficFine" asp-action="Index">Tüm Cezalar</a>
+</li>
                         <div class="d-flex align-items-center gap-3">
                             <span class="navbar-text">S
                                 @User.GetNameSurname()
