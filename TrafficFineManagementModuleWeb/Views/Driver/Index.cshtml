@@ -1,0 +1,55 @@
+﻿@model List<Driver>
+@{
+    ViewData["Title"] = "Sürücüler";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">Sürücüler</h3>
+    <a asp-action="Create" class="btn btn-primary">Yeni Sürücü</a>
+</div>
+
+<form asp-action="Index" method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input name="search" value="@ViewData["Search"]" class="form-control" placeholder="Ad soyad ara..." />
+    </div>
+    <div class="col-md-auto">
+        <button type="submit" class="btn btn-outline-secondary">Ara</button>
+        <a asp-action="Index" class="btn btn-link">Temizle</a>
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Kayıtlı sürücü bulunamadı.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Ad Soyad</th>
+                    <th>TC Kimlik No</th>
+                    <th>Ehliyet No</th>
+                    <th>Ehliyet Sınıfı</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var driver in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@driver.DriverNameSurname</td>
+                        <td>@driver.NationIdentityNo.MaskIdentityNo()</td>
+                        <td>@driver.DriverLicenceNo</td>
+                        <td><span class="badge bg-light text-dark border">@driver.DriverLicenceClass</span></td>
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@driver.DriverId"
+                               class="btn btn-sm btn-outline-primary">Düzenle</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

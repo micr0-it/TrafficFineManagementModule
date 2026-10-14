@@ -1,0 +1,51 @@
+﻿@model DriverFormViewModel
+@{
+    ViewData["Title"] = Model.IsEdit ? "Sürücü Düzenle" : "Yeni Sürücü";
+}
+
+<h3 class="mb-3">@ViewData["Title"]</h3>
+
+<div class="row">
+    <div class="col-lg-6">
+        <form asp-action="@(Model.IsEdit ? "Edit" : "Create")" method="post">
+            <input type="hidden" asp-for="DriverId" />
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="mb-3">
+                <label asp-for="DriverNameSurname" class="form-label"></label>
+                <input asp-for="DriverNameSurname" class="form-control" />
+                <span asp-validation-for="DriverNameSurname" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="NationIdentityNo" class="form-label"></label>
+                <input asp-for="NationIdentityNo" class="form-control" maxlength="11" inputmode="numeric" />
+                <span asp-validation-for="NationIdentityNo" class="text-danger small"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="DriverLicenceNo" class="form-label"></label>
+                    <input asp-for="DriverLicenceNo" class="form-control" />
+                    <span asp-validation-for="DriverLicenceNo" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="DriverLicenceClass" class="form-label"></label>
+                    <select asp-for="DriverLicenceClass" class="form-select"
+                            asp-items="@(new SelectList(DriverFormViewModel.LicenceClasses))">
+                        <option value="">Seçiniz</option>
+                    </select>
+                    <span asp-validation-for="DriverLicenceClass" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+            <a asp-action="Index" class="btn btn-link">Vazgeç</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
