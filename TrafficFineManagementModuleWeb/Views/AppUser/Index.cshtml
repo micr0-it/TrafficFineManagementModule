@@ -1,0 +1,64 @@
+﻿@model List<AppUser>
+@{
+    ViewData["Title"] = "Kullanıcılar";
+    var currentUserId = User.GetUserId();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">Kullanıcılar</h3>
+    <a asp-action="Create" class="btn btn-primary">Yeni Kullanıcı</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Ad Soyad</th>
+                <th>Kullanıcı Adı</th>
+                <th>Sicil No</th>
+                <th>Rol</th>
+                <th>Durum</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var appUser in Model)
+            {
+                <tr class="@(appUser.IsActive ? "" : "text-muted")">
+                    <td class="fw-semibold">@appUser.NameSurname</td>
+                    <td>@appUser.AppUserName</td>
+                    <td>@appUser.RegistrationNumber</td>
+                    <td><span class="badge bg-light text-dark border">@appUser.Role.GetDisplayName()</span></td>
+                    <td>
+                        @if (appUser.IsActive)
+                        {
+                            <span class="badge bg-success">Aktif</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Pasif</span>
+                        }
+                    </td>
+                    <td class="text-end">
+                        @if (appUser.Role != UserRole.Admin && appUser.AppUserId != currentUserId)
+                        {
+                            <form asp-action="SetActiveStatus" asp-route-id="@appUser.AppUserId"
+                                  method="post" class="d-inline"
+                                  onsubmit="return confirm('@(appUser.IsActive ? "Kullanıcı pasif yapılsın mı? Sisteme giriş yapamayacak." : "Kullanıcı tekrar aktif yapılsın mı?")');">
+                                <input type="hidden" name="isActive" value="@(!appUser.IsActive ? "true" : "false")" />
+                                @if (appUser.IsActive)
+                                {
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Pasif Yap</button>
+                                }
+                                else
+                                {
+                                    <button type="submit" class="btn btn-sm btn-outline-success">Aktif Yap</button>
+                                }
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

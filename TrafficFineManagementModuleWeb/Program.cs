@@ -3,11 +3,14 @@ using BusinessLayer.Concrete;
 using DataAccessLayer.Abstract;
 using DataAccessLayer.Concrete;
 using DataAccessLayer.Concrete.EntityFramework;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Globalization;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(o =>
@@ -22,6 +25,28 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         o.ExpireTimeSpan = TimeSpan.FromHours(8);
         //SlidingExpiration, kullanıcı aktif olduğu sürece oturum süresini yeniler; 8 saat boyunca hiç işlem yapmazsa oturum düşer.
         o.SlidingExpiration = true;
+
+        //Ai'ya güvenlik açığı ile ilgili kullanıcıyı pasif yaptım ama ya sisteme girebilmesi devam eder mi diye sordum
+        //Bu kod blogu ile bunu engelleyebileceğimi söyledi.
+        //Pasif yapılan kullanıcının açık oturumu bir sonraki istekte sonlandırılır
+        o.Events.OnValidatePrincipal = async context =>
+        {
+            var userIdValue = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdValue, out var userId))
+            {
+                context.RejectPrincipal();
+                return;
+            }
+
+            var appUserService = context.HttpContext.RequestServices.GetRequiredService<IAppUserService>();
+            var appUser = await appUserService.GetByIdAsync(userId);
+
+            if (appUser is null || !appUser.IsActive)
+            {
+                context.RejectPrincipal();
+                await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            }
+        };
     });
 
 // Aksi belirtilmedikçe tüm sayfalar giriş gerektirir

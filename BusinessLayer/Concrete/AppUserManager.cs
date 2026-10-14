@@ -63,10 +63,7 @@ namespace BusinessLayer.Concrete
             throw new BusinessException("Kullanıcılar silinemez, pasif yapılabilir.");
         }
 
-        public Task<List<AppUser>> GetListAsync(Expression<Func<AppUser, bool>>? filter = null)
-        {
-            throw new NotImplementedException();
-        }
+       
 
         public async Task SetActiveStatusAsync(int userId, bool isActive)
         {
@@ -107,9 +104,6 @@ namespace BusinessLayer.Concrete
             return result == PasswordVerificationResult.Failed ? null : user;
         }
 
-        Task<AppUser?> IGenericService<AppUser>.GetByIdAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }
