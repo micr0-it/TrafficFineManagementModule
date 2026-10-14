@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.Abstract;
 using BusinessLayer.Exceptions;
 using BusinessLayer.Models;
+using BusinessLayer.Workflow;
 using EntityLayer.Concrete;
 using EntityLayer.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -15,6 +16,8 @@ namespace TrafficFineManagementModuleWeb.Controllers
 {
     public class TrafficFineController : Controller
     {
+        // Onay/ret işlemlerini yapabilecek roller: "Manager,Finance"
+        private const string ApproverRoles = $"{nameof(UserRole.Manager)},{nameof(UserRole.Finance)}";
         private readonly ITrafficFineService _trafficFineService;
         private readonly IVehicleService _vehicleService;
         private readonly IDriverService _driverService;
@@ -55,6 +58,90 @@ namespace TrafficFineManagementModuleWeb.Controllers
 
             return View(model);
         }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var trafficFine = await _trafficFineService.GetByIdWithDetailsAsync(id);
+            if (trafficFine is null)
+            {
+                return NotFound();
+            }
+
+            var role = User.GetUserRole();
+
+            // "Yeni" aşamasında onaya gönderme işlemi sadece Cezalarım ekranından (Submit) yapılır,
+            // bu yüzden detay sayfasında personele onay butonu gösterilmez.
+            var canApprove = ApprovalWorkFlow.CanApprove(trafficFine.ApprovalStatus, role)
+                             && role != UserRole.Personnel;
+
+            var viewModel = new TrafficFineDetailsViewModel
+            {
+                Fine = trafficFine,
+                CurrentStep = ApprovalWorkFlow.GetStep(trafficFine.ApprovalStatus),
+                CanApprove = canApprove,
+                CanReject = ApprovalWorkFlow.CanReject(trafficFine.ApprovalStatus, role)
+            };
+
+            return View(viewModel);
+        }
+
+
+        // ---------- Yönetici ve Finans: bekleyen işler ----------
+
+        [HttpGet]
+        [Authorize(Roles = ApproverRoles)]
+        public async Task<IActionResult> Pending()
+        {
+            var trafficFines = await _trafficFineService.GetActionableFinesAsync(User.GetUserId(), User.GetUserRole());
+            return View(trafficFines);
+        }
+
+        /// <summary>
+        /// Cezayı bulunduğu aşamada onaylar. Hangi aşamaya geçileceğine ApprovalWorkflow karar verir.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = ApproverRoles)]
+        public async Task<IActionResult> Approve(int id, string? description)
+        {
+            try
+            {
+                await _trafficFineService.ApproveAsync(id, User.GetUserId(), User.GetUserRole(), description);
+                TempData["Success"] = "Ceza onaylandı ve bir sonraki aşamaya iletildi.";
+                return RedirectToAction(nameof(Pending));
+            }
+            catch (BusinessException ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction(nameof(Details), new { id });
+            }
+        }
+
+        /// <summary>
+        /// Cezayı reddeder. Ret nedeni zorunludur (Business katmanında kontrol edilir).
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = ApproverRoles)]
+        public async Task<IActionResult> Reject(int id, string? description)
+        {
+            try
+            {
+                await _trafficFineService.RejectAsync(id, User.GetUserId(), User.GetUserRole(), description ?? string.Empty);
+                TempData["Success"] = "Ceza reddedildi.";
+                return RedirectToAction(nameof(Pending));
+            }
+            catch (BusinessException ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction(nameof(Details), new { id });
+            }
+        }
+
+
 
         // ---------- Personel: kendi cezaları ----------
 

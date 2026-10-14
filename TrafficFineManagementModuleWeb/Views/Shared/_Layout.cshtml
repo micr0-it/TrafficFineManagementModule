@@ -41,7 +41,12 @@
                         }
                             </li>
                         }
-                        
+                        @if (User.IsInRole(nameof(UserRole.Manager)) || User.IsInRole(nameof(UserRole.Finance)))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="TrafficFine" asp-action="Pending">Bekleyen İşlerim</a>
+                        </li>
+                    }
                     @if (User.IsInRole(nameof(UserRole.Personnel)))
                     {
                         <li class="nav-item">

@@ -1,0 +1,51 @@
+﻿@model List<TrafficFine>
+@{
+    ViewData["Title"] = "Bekleyen İşlerim";
+}
+
+<h3 class="mb-1">Bekleyen İşlerim</h3>
+<p class="text-muted mb-3">
+    @User.GetUserRole().GetDisplayName() aşamasında işleminizi bekleyen cezalar.
+</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-success">Bekleyen işiniz yok.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Tutanak No</th>
+                    <th>Ceza Tarihi</th>
+                    <th>Plaka</th>
+                    <th>Ceza Türü</th>
+                    <th class="text-end">Tutar</th>
+                    <th>Giren</th>
+                    <th>Durum</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var fine in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@fine.TrafficFineRecordNo</td>
+                        <td>@fine.TrafficFineDate.ToDateTime()</td>
+                        <td>@fine.Vehicle.VehiclePlate</td>
+                        <td title="@fine.TrafficFineType.Description">@fine.TrafficFineType.Article</td>
+                        <td class="text-end">@fine.TrafficFineAmount.ToMoney()</td>
+                        <td>@fine.RecordedByPersonnel.NameSurname</td>
+                        <td><partial name="_ApprovalStatusBadge" model="fine.ApprovalStatus" /></td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@fine.TrafficFineId"
+                               class="btn btn-sm btn-primary">İncele</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

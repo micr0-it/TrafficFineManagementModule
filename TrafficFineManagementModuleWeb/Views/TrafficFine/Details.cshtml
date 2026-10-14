@@ -1,0 +1,150 @@
+﻿@model TrafficFineDetailsViewModel
+@{
+    var fine = Model.Fine;
+    ViewData["Title"] = $"Ceza {fine.TrafficFineRecordNo}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">
+        Ceza @fine.TrafficFineRecordNo
+        <partial name="_ApprovalStatusBadge" model="fine.ApprovalStatus" />
+    </h3>
+    <a asp-action="Index" class="btn btn-link">Tüm Cezalar</a>
+</div>
+
+<div class="row g-3">
+    <!-- Ceza bilgileri -->
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header fw-semibold">Ceza Bilgileri</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Ceza Tarihi</dt>
+                    <dd class="col-sm-8">@fine.TrafficFineDate.ToDateTime()</dd>
+
+                    <dt class="col-sm-4">Tebliğ Tarihi</dt>
+                    <dd class="col-sm-8">@fine.DateOfNotification.ToDate()</dd>
+
+                    <dt class="col-sm-4">Ceza Türü</dt>
+                    <dd class="col-sm-8">
+                        @fine.TrafficFineType.Article
+                        <div class="text-muted small">@fine.TrafficFineType.Description</div>
+                    </dd>
+
+                    <dt class="col-sm-4">Tutar</dt>
+                    <dd class="col-sm-8 fw-semibold">@fine.TrafficFineAmount.ToMoney()</dd>
+
+                    <dt class="col-sm-4">Ceza Puanı</dt>
+                    <dd class="col-sm-8">@fine.TrafficFineType.TrafficFinePoint</dd>
+
+                    <dt class="col-sm-4">Araç</dt>
+                    <dd class="col-sm-8">
+                        @fine.Vehicle.VehiclePlate
+                        <div class="text-muted small">
+                            @fine.Vehicle.VehicleType.GetDisplayName() · @fine.Vehicle.VehicleBrand @fine.Vehicle.VehicleModel
+                        </div>
+                    </dd>
+
+                    <dt class="col-sm-4">Sürücü</dt>
+                    <dd class="col-sm-8">
+                        @if (fine.Driver is not null)
+                        {
+                            @fine.Driver.DriverNameSurname
+                            <div class="text-muted small">Ehliyet: @fine.Driver.DriverLicenceClass</div>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Bilinmiyor</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Giren Personel</dt>
+                    <dd class="col-sm-8">@fine.RecordedByPersonnel.NameSurname</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onay durumu ve işlemler -->
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header fw-semibold">Onay Durumu</div>
+            <div class="card-body">
+                @if (Model.CurrentStep is null)
+                {
+                    @if (fine.ApprovalStatus == ApprovalStatus.Completed)
+                    {
+                        <div class="alert alert-success mb-0">Onay süreci tamamlandı.</div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger mb-0">Bu ceza reddedildi. Ret nedeni onay geçmişinde yer alır.</div>
+                    }
+                }
+                else
+                {
+                    <p class="mb-1">
+                        Bekleyen işlem:
+                        <strong>@Model.CurrentStep.ResponsibleRole.GetDisplayName()</strong>
+                    </p>
+                    <p class="text-muted small">
+                        Onaylanırsa: @Model.CurrentStep.NextStatus.GetDisplayName()
+                    </p>
+
+                    @if (Model.HasAction)
+                    {
+                        <form method="post">
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Açıklama / Ret nedeni</label>
+                                <textarea id="description" name="description" class="form-control"
+                                          rows="3" maxlength="500"
+                                          placeholder="Onayda isteğe bağlı, retde zorunlu"></textarea>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                @if (Model.CanApprove)
+                                {
+                                    <button type="submit" class="btn btn-success"
+                                            asp-action="Approve" asp-route-id="@fine.TrafficFineId"
+                                            onclick="return confirm('Ceza onaylansın mı?');">
+                                        @Model.ApproveButtonText
+                                    </button>
+                                }
+                                @if (Model.CanReject)
+                                {
+                                    <button type="submit" class="btn btn-outline-danger"
+                                            asp-action="Reject" asp-route-id="@fine.TrafficFineId"
+                                            onclick="return confirmReject();">
+                                        Reddet
+                                    </button>
+                                }
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-light border mb-0 small">
+                            Bu aşamada işlem yapma yetkiniz yok.
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Onay geçmişi 6. adımda buraya eklenecek *@
+
+@section Scripts {
+    <script>
+        function confirmReject() {
+            const description = document.getElementById('description');
+            if (!description.value.trim()) {
+                alert('Reddetmek için ret nedeni yazmalısınız.');
+                description.focus();
+                return false;
+            }
+            return confirm('Ceza reddedilsin mi? Bu işlem geri alınamaz.');
+        }
+    </script>
+}
