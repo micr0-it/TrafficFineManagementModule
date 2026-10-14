@@ -1,8 +1,115 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model DashboardViewModel
+@{
+    ViewData["Title"] = "Ana Sayfa";
+    var role = User.GetUserRole();
+
+    var statusCards = new[]
+    {
+        ApprovalStatus.New,
+        ApprovalStatus.PendingManagerApproval,
+        ApprovalStatus.PendingFinanceApproval,
+        ApprovalStatus.Completed,
+        ApprovalStatus.Rejected
+    };
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h3 class="mb-1">Hoş geldiniz, @User.GetNameSurname()</h3>
+<p class="text-muted mb-4">@role.GetDisplayName()</p>
+
+@* Kullanıcıya özel bekleyen iş uyarısı *@
+@if (Model.MyActionCount > 0)
+{
+    var actionLink = role == UserRole.Personnel ? "MyFines" : "Pending";
+    var actionText = role == UserRole.Personnel
+        ? "onaya gönderilmeyi bekleyen cezanız var."
+        : "cezanın onayınızı beklediği var.";
+
+    <div class="alert alert-warning d-flex justify-content-between align-items-center">
+        <span><strong>@Model.MyActionCount</strong> @actionText</span>
+        <a asp-controller="TrafficFine" asp-action="@actionLink" class="btn btn-sm btn-warning">Görüntüle</a>
+    </div>
+}
+else if (role != UserRole.Admin)
+{
+    <div class="alert alert-success">Bekleyen işiniz yok.</div>
+}
+
+@* Aşamalara göre ceza sayıları *@
+<div class="row g-3 mb-4">
+    @foreach (var status in statusCards)
+    {
+        <div class="col-6 col-md">
+            <a asp-controller="TrafficFine" asp-action="Index" asp-route-Status="@status"
+               class="card text-decoration-none h-100">
+                <div class="card-body text-center">
+                    <div class="fs-2 fw-semibold text-dark">@Model.GetCount(status)</div>
+                    <partial name="_ApprovalStatusBadge" model="status" />
+                </div>
+            </a>
+        </div>
+    }
+</div>
+
+@* Tutar özetleri *@
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Toplam Ceza</div>
+                <div class="fs-4 fw-semibold">@Model.TotalCount</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Onay Sürecindeki Tutar</div>
+                <div class="fs-4 fw-semibold">@Model.InApprovalAmount.ToMoney()</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Tamamlanan Tutar</div>
+                <div class="fs-4 fw-semibold text-success">@Model.CompletedAmount.ToMoney()</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Son girilen cezalar *@
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Son Cezalar</span>
+        <a asp-controller="TrafficFine" asp-action="Index" class="small">Tümünü gör</a>
+    </div>
+
+    @if (!Model.RecentFines.Any())
+    {
+        <div class="card-body text-muted">Henüz ceza kaydı yok.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <tbody>
+                    @foreach (var fine in Model.RecentFines)
+                    {
+                        <tr>
+                            <td class="fw-semibold">
+                                <a asp-controller="TrafficFine" asp-action="Details" asp-route-id="@fine.TrafficFineId">
+                                    @fine.TrafficFineRecordNo
+                                </a>
+                            </td>
+                            <td>@fine.TrafficFineDate.ToDate()</td>
+                            <td>@fine.Vehicle.VehiclePlate</td>
+                            <td class="text-end">@fine.TrafficFineAmount.ToMoney()</td>
+                            <td class="text-end"><partial name="_ApprovalStatusBadge" model="fine.ApprovalStatus" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </div>
