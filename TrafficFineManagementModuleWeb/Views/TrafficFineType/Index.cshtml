@@ -1,0 +1,66 @@
+﻿@model List<TrafficFineType>
+@{
+    ViewData["Title"] = "Ceza Türleri";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">Ceza Türleri</h3>
+    <a asp-action="Create" class="btn btn-primary">Yeni Ceza Türü</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Kayıtlı ceza türü bulunamadı.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Kanun Maddesi</th>
+                    <th>Açıklama</th>
+                    <th class="text-end">Tutar</th>
+                    <th class="text-end">Puan</th>
+                    <th>Durum</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var fineType in Model)
+                {
+                    <tr class="@(fineType.IsActive ? "" : "text-muted")">
+                        <td class="fw-semibold">@fineType.Article</td>
+                        <td>@fineType.Description</td>
+                        <td class="text-end">@fineType.Amount.ToMoney()</td>
+                        <td class="text-end">@fineType.TrafficFinePoint</td>
+                        <td>
+                            @if (fineType.IsActive)
+                            {
+                                <span class="badge bg-success">Aktif</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Pasif</span>
+                            }
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <a asp-action="Edit" asp-route-id="@fineType.TrafficFineTypeId"
+                               class="btn btn-sm btn-outline-primary">Düzenle</a>
+                            @if (fineType.IsActive)
+                            {
+                                <form asp-action="Deactivate" asp-route-id="@fineType.TrafficFineTypeId"
+                                      method="post" class="d-inline"
+                                    @*Pasif yapma butonu bir <form method="post"> içinde: veri değiştiren işlemler link (GET) ile değil, her zaman POST ile yapılır*@
+                                      @*Yanlışıkla tıklamaya karşı onaya sunuyorum*@
+                                      onsubmit="return confirm('Bu ceza türü pasif yapılsın mı? Yeni cezalarda seçilemeyecek.');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Pasif Yap</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
