@@ -5,7 +5,9 @@ using DataAccessLayer.Concrete;
 using DataAccessLayer.Concrete.EntityFramework;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(o =>
@@ -60,6 +62,15 @@ using (var scope = app.Services.CreateScope())
     await DbSeeder.SeedAsync(db);
 }
 app.UseHttpsRedirection();
+
+// Form verisi kültürden bağımsız okunur (ondalık ayırıcı her zaman nokta).
+// Ekranda gösterim ise FormatExtensions ile açıkça Türkçe yapılır.
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(CultureInfo.InvariantCulture),
+    SupportedCultures = new[] { CultureInfo.InvariantCulture },
+    SupportedUICultures = new[] { CultureInfo.InvariantCulture }
+});
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
