@@ -81,7 +81,7 @@ Tüm veritabanı işlemleri `async/await` ile asenkron yapılır.
 **1. Depoyu klonlayın**
 
 ```bash
-git clone <depo-adresi>
+git clone <https://github.com/micr0-it/TrafficFineManagementModule>
 ```
 
 **2. Connection string'i ayarlayın**
