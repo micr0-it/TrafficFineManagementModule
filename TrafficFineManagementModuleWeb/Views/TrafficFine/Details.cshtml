@@ -78,7 +78,21 @@
                     }
                     else
                     {
-                        <div class="alert alert-danger mb-0">Bu ceza reddedildi. Ret nedeni onay geçmişinde yer alır.</div>
+                        var rejection = fine.ApprovalHistories
+                            .Where(h => h.ActionType == ApprovalActionType.Rejected)
+                            .OrderByDescending(h => h.ActionDate)
+                            .FirstOrDefault();
+
+                        <div class="alert alert-danger mb-0">
+                            <div class="fw-semibold">Bu ceza reddedildi.</div>
+                            @if (rejection is not null)
+                            {
+                                <div class="mt-1">Ret nedeni: @rejection.Description</div>
+                                <div class="small text-muted mt-1">
+                                    @rejection.PerformedByUser.NameSurname · @rejection.ActionDate.ToDateTime()
+                                </div>
+                            }
+                        </div>
                     }
                 }
                 else
@@ -133,7 +147,8 @@
     </div>
 </div>
 
-@* Onay geçmişi 6. adımda buraya eklenecek *@
+@* Onay geçmişi buraya eklenecek *@
+<partial name="_ApprovalHistory" model="fine.ApprovalHistories" />
 
 @section Scripts {
     <script>

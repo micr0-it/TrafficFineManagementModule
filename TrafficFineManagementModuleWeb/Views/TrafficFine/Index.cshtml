@@ -67,8 +67,9 @@ else
                 @foreach (var fine in Model.Fines)
                 {
                     <tr>
-                        <td class="fw-semibold">@fine.TrafficFineRecordNo</td>
-                        <td>@fine.TrafficFineDate.ToDateTime()</td>
+                        <td class="fw-semibold">
+                            <a asp-action="Details" asp-route-id="@fine.TrafficFineId">@fine.TrafficFineRecordNo</a>
+                        </td>                        <td>@fine.TrafficFineDate.ToDateTime()</td>
                         <td>@fine.Vehicle.VehiclePlate</td>
                         <td>@fine.Vehicle.VehicleType.GetDisplayName()</td>
                         <td title="@fine.TrafficFineType.Description">@fine.TrafficFineType.Article</td>
