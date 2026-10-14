@@ -215,6 +215,27 @@ Controller'lardaki `try/catch` blokları yalnızca **beklenen** hatalar (`Busine
 
 ---
 
+
+## Güvenlik
+
+| Konu | Önlem |
+|---|---|
+| SQL Injection | Tüm sorgular EF Core LINQ ile yazılmıştır; değerler parametre olarak gönderilir, elle SQL kullanılmaz. |
+| XSS | Razor çıktıları otomatik encode edilir; `Html.Raw` kullanılmaz. |
+| CSRF | Veri değiştiren tüm işlemler POST ve anti-forgery token ile yapılır. |
+| Yetkilendirme | Varsayılan olarak tüm sayfalar giriş gerektirir; rol kontrolleri controller'da, aşama ve sahiplik kontrolleri ayrıca Business katmanında yapılır. |
+| Overposting | Formlarda ViewModel kullanılır; durum, tutar ve kaydı giren kullanıcı sunucuda atanır. |
+| Open redirect | Login sonrası sadece yerel adreslere yönlendirilir. |
+| Şifreler | `PasswordHasher` (PBKDF2, salt'lı) ile hash'lenerek saklanır. |
+| Güvenlik header'ları | `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`. |
+
+**Bilinen eksikler**
+- Hatalı girişlerde hesap kilitleme / istek sınırlama (rate limiting) yoktur.
+- Content-Security-Policy eklenmemiştir (view'larda satır içi script'ler bulunduğu için).
+- Seed kullanıcıları test amaçlı ortak bir şifre (`Test123`) kullanır; canlı ortama alınmadan önce bu kullanıcılar kaldırılmalı veya şifreleri değiştirilmelidir.
+
+---
+
 ## Tasarım Kararları
 
 - **Kimlik doğrulama:** ASP.NET Core Identity yerine Cookie Authentication ve `PasswordHasher<T>` kullanıldı; iki rollü basit bir yapı için daha sade bir veri modeli sağlıyor. Şifreler hash'lenerek saklanır.
