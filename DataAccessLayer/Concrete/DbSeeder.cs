@@ -33,9 +33,9 @@ namespace DataAccessLayer.Concrete
             var seedUsers = new List<AppUser>
             {
                 new() { AppUserName = "admin",    NameSurname = "Sistem Yöneticisi", RegistrationNumber = "0001", Role = UserRole.Admin },
-                new() { AppUserName = "personel", NameSurname = "Ahmet Kaya",        RegistrationNumber = "0002", Role = UserRole.Personnel },
+                new() { AppUserName = "personel", NameSurname = "İsmail Yüksek",        RegistrationNumber = "0002", Role = UserRole.Personnel },
                 new() { AppUserName = "yonetici", NameSurname = "Elif Demir",        RegistrationNumber = "0003", Role = UserRole.Manager },
-                new() { AppUserName = "finans",   NameSurname = "Murat Şahin",       RegistrationNumber = "0004", Role = UserRole.Finance }
+                new() { AppUserName = "finans",   NameSurname = "Marco Asensio",       RegistrationNumber = "0004", Role = UserRole.Finance }
             };
 
             foreach (var appUser in seedUsers)

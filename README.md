@@ -102,6 +102,12 @@ git clone <https://github.com/micr0-it/TrafficFineManagementModule>
 
 JSON içinde ters slash iki kez (`\\`) yazılmalıdır. Veritabanını önceden oluşturmanıza gerek yoktur.
 
+
+Varsayılan değer LocalDB'yi kullanır. Kendi bilgisayarınıza özel bir değeri repoya eklemeden kullanmak için
+web projesine sağ tıklayıp **Manage User Secrets** ile açılan `secrets.json` dosyasına aynı
+`ConnectionStrings` bölümünü yazabilirsiniz; geliştirme ortamında bu değer `appsettings.json`'daki değeri ezer.
+
+
 **3. Veritabanını oluşturun**
 
 Visual Studio'da `TrafficFineManagementModuleWeb` projesini startup project yapın. Package Manager Console'da **Default project** olarak `DataAccessLayer` seçip:

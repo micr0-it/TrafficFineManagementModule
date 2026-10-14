@@ -92,6 +92,19 @@ using (var scope = app.Services.CreateScope())
 }
 app.UseHttpsRedirection();
 
+
+// Temel güvenlik header'ları
+app.Use(async (context, next) =>
+{
+    // Sayfanın başka sitelerde iframe içinde açılmasını engeller (clickjacking)
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    // Tarayıcının dosya türünü tahmin etmesini engeller
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    // Başka sitelere giderken tam adresin paylaşılmasını sınırlar
+    context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    await next();
+});
+
 // Form verisi kültürden bağımsız okunur (ondalık ayırıcı her zaman nokta).
 // Ekranda gösterim ise FormatExtensions ile açıkça Türkçe yapılır.
 app.UseRequestLocalization(new RequestLocalizationOptions
